@@ -37,23 +37,23 @@ def main(input_directory, output_file, swissprot_tsv, plot_file):
 	# Globs tier 1 through 3 .fasta isoform file names from JCAST into a list.
 	isoform_fastas = sorted(list(glob.glob(input_directory+"psq_T[1-3].fasta")))
 	
-	columns = [
-	    "database", 
-	    "accession_number", 
-	    "prot_name", 
-	    "ensembl_gene_id", 
-	    "rmats_jxn_type", 
-	    "input_file_row", 
-	    "chromosome", 
-	    "anchor_exon_start_end", 
-	    "alt_exon_start_end", 
-	    "translated_strand_and_phase", 
-	    "msjc", 
-	    "tier",
-	    "prot_sequence",
-	]
-
-	main_df = pd.DataFrame(columns=columns)
+	main_df = pd.DataFrame(
+		columns = [
+		    "database", 
+		    "accession_number", 
+		    "prot_name", 
+		    "ensembl_gene_id", 
+		    "rmats_jxn_type", 
+		    "input_file_row", 
+		    "chromosome", 
+		    "anchor_exon_start_end", 
+		    "alt_exon_start_end", 
+		    "translated_strand_and_phase", 
+		    "msjc", 
+		    "tier",
+		    "prot_sequence",
+		]
+	)
 
 	i = 0
 	for fasta in isoform_fastas:
