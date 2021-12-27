@@ -42,6 +42,7 @@ The 3DFI pipeline automates protein structure predictions, structural homology s
     	* [trRosetta](#trRosetta---deep-learning-based-protein-structure-modeling)
 		* [trRosetta2](#trRosetta2---deep-learning-based-protein-structure-modeling)
 * [Funding and acknowledgments](#Funding-and-acknowledgments)
+* [How to cite](#how-to-cite)
 * [References](#references)
 </details>
 
@@ -99,7 +100,7 @@ The 3DFI pipeline requires the following software to perform protein structure p
 3. A structural homology search tool:
 	- GESAMT via [CCP4](https://www.ccp4.ac.uk/)
 4. An alignment/visualization tool:
-	- [ChimeraX](https://www.rbvi.ucsf.edu/chimerax/download.html)
+	- [ChimeraX](https://www.rbvi.ucsf.edu/chimerax/older_releases.html) 1.2.5
 5. [Perl5](https://www.perl.org/) and the additonal scripting module:
 	- [PerlIO::gzip](https://metacpan.org/pod/PerlIO::gzip)
 
@@ -135,7 +136,7 @@ export PATH=$PATH:$CCP4
 ```
 
 ##### ChimeraX
-[ChimeraX](https://www.rbvi.ucsf.edu/chimerax/download.html) is provided as .deb and .rpm packages for Debian- and RedHat-based Linux distributions. On Fedora, ChimeraX can be installed from the command line with the DNF package manager.
+[ChimeraX](https://www.rbvi.ucsf.edu/chimerax/older_releases.html) 1.2.5 is provided as .deb and .rpm packages for Debian- and RedHat-based Linux distributions. On Fedora, ChimeraX can be installed from the command line with the DNF package manager.
 ```Bash
 sudo dnf install ucsf-chimerax-*.rpm
 ```
@@ -193,6 +194,10 @@ cd 3DFI/
 -pyr (--pyrosetta)	PyRosetta4 [Python-3.7.Release] .tar.bz2 archive to install
 			# Download - https://www.pyrosetta.org/downloads#h.xe4c0yjfkl19
 			# License - https://els2.comotion.uw.edu/product/pyrosetta
+
+## Docker
+-name (--docker_image)	Name of the AlphaFold docker image to build [Default: alphafold_3dfi]
+-rebuild		Build/rebuild the docker image with the --pull and --no-cache flags
 ```
 </details>
 
@@ -335,12 +340,16 @@ run_3DFI.pl \
 
 ## 3D Folding options
 -n (--nogpu)		ALPHAFOLD/ROSETTAFOLD: Turn off GPU acceleration / use CPU only
+-g (--gpu_dev)		ALPHAFOLD: list of GPU devices to use: e.g. all; 0,1; 0,1,2,3 [Default: all]
 -m (--maxdate)		ALPHAFOLD: --max_template_date option (YYYY-MM-DD) [Default: current date]
--k (--ranks)		RAPTORX: Number of top ranks to model [Default: 5]
+-s (--preset)		ALPHAFOLD: full_dbs or reduced_dbs [Default: full_dbs]
+-i (--docker_image)	ALPHAFOLD: docker image name [Default: alphafold_3dfi]
+-u (--use_msas)		ALPHAFOLD: Use precomputed MSAs
+-k (--ranks)		RAPTORX: \# Number of top ranks to model [Default: 5]
 --modeller		RAPTORX: Modeller version [Default: mod10.1]
 
 ## Structural homology / alignment
--d (--db)		3DFI database location containing the RCSB PDB files / GESAMT archive [Default: $TDFI_DB]
+-d (--db)		3DFI database location containing the RCSB PDB files / GESAMT archive [Default: \$TDFI_DB]
 -q (--qscore)		Mininum Q-score to keep [Default: 0.3]
 -b (--best)		Keep the best match(es) only (top X hits) [Default: 5]
 --query			Models to query per protein and predictor: all or best [Default: all]
@@ -711,11 +720,12 @@ alphafold.pl \
 -o (--outdir)		Output directory
 -d (--docker)		Docker image name [Default: alphafold_3dfi]
 -m (--max_date)		--max_template_date option (YYYY-MM-DD) from AlphaFold2 [Default: current date]
--p (--preset)		Alphafold preset: full_dbs, reduced_dbs or casp14 [Default: full_dbs]
+-p (--preset)		Alphafold --db_preset: full_dbs or reduced_dbs [Default: full_dbs]
+-u (--use_msas)		Use precomputed MSAs
 -g (--gpu_dev)		List of GPU devices to use: e.g. all; 0,1; 0,1,2,3 [Default: all]
 -n (--no_gpu)		Turns off GPU acceleration
--ah (--alpha_home)	AlphaFold2 installation directory [Default: $ALPHAFOLD_HOME]
--ad (--alpha_db)	AlphaFold2 databases location [Default: $TDFI_DB/ALPHAFOLD]
+-ah (--alpha_home)	AlphaFold2 installation directory [Default: \$ALPHAFOLD_HOME]
+-ad (--alpha_db)	AlphaFold2 databases location [Default: \$TDFI_DB/ALPHAFOLD]
 ```
 </details>
 
@@ -1577,6 +1587,28 @@ This work was supported in part by the National Institute of Allergy and Infecti
 </details>
 
 <hr size="8" width="100%">  
+
+<details open>
+  <summary><b><i>Show/hide section: How to cite</i></b></summary>
+
+## How to cite
+##### If you use this pipeline, please cite the 3DFI publication:
+
+[3DFI: a pipeline to infer protein function using structural homology](https://academic.oup.com/bioinformaticsadvances/article/1/1/vbab030/6424973). **Julian AT, Mascarenhas dos Santos AC, Pombert JF.** Bioinformatics Advances, Volume 1, Issue 1, 2021, vbab030. DOI: 10.1093/bioadv/vbab030.
+
+##### Please also cite the tool(s) used for protein stucture prediction (AlphaFold, RoseTTAFold and/or RaptorX), structural homology searches (GESAMT) and 3D visualization (ChimeraX), as needed:
+
+[Highly accurate protein structure prediction with AlphaFold](https://pubmed.ncbi.nlm.nih.gov/34265844/). **Jumper J,** ***et al.*** Nature. 2021 Jul 15. Online ahead of print. PMID: 34265844 DOI: 10.1038/s41586-021-03819-2.
+
+[Accurate prediction of protein structures and interactions using a three-track neural network](https://pubmed.ncbi.nlm.nih.gov/34282049/). **Baek M,** ***et al.*** Science. 2021 Jul 15; eabj8754. Online ahead of print. PMID: 34282049 DOI: 10.1126/science.abj8754
+
+[RaptorX: exploiting structure information for protein alignment by statistical inference](https://pubmed.ncbi.nlm.nih.gov/21987485/). **Peng J, Xu J.** Proteins. 2011;79 Suppl 10:161-71. PMID: 21987485 PMCID: PMC3226909 DOI: 10.1002/prot.23175
+
+[Enhanced fold recognition using efficient short fragment clustering](https://pubmed.ncbi.nlm.nih.gov/27882309/). **Krissinel E.** J Mol Biochem. 2012;1(2):76-85. PMID: 27882309 PMCID: PMC5117261
+
+[UCSF ChimeraX: Structure visualization for researchers, educators, and developers](https://www.ncbi.nlm.nih.gov/pubmed/32881101). **Pettersen EF, Goddard TD, Huang CC, Meng EC, Couch GS, Croll TI, Morris JH, Ferrin TE**. Protein Sci. 2021 Jan;30(1):70-82.  PMID: 32881101 PMCID: PMC7737788 DOI: 10.1002/pro.3943
+
+</details>
 
 <details open>
   <summary><b><i>Show/hide section: References</i></b></summary>

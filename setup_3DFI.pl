@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 ## Pombert Lab, Illinois Tech, 2021
 my $name = 'setup_3DFI.pl';
-my $version = '0.5a';
-my $updated = '2021-09-23';
+my $version = '0.5c';
+my $updated = '2021-12-23';
 
 use strict;
 use warnings;
@@ -35,7 +35,11 @@ OPTIONS:
 -i (--install)		3D structure predictor(s) to install (alphafold raptorx and/or rosettafold)
 -pyr (--pyrosetta)	PyRosetta4 [Python-3.7.Release] .tar.bz2 archive to install
 			# Download - https://www.pyrosetta.org/downloads#h.xe4c0yjfkl19
-			# License - https://els2.comotion.uw.edu/product/pyrosetta 
+			# License - https://els2.comotion.uw.edu/product/pyrosetta
+
+## Docker
+-name (--docker_image)	Name of the AlphaFold docker image to build [Default: alphafold_3dfi]
+-rebuild		Build/rebuild the docker image with the --pull and --no-cache flags
 OPTIONS
 die "\n$usage\n" unless @ARGV;
 
@@ -45,13 +49,17 @@ my $path_3DFI = "./";
 my $database;
 my @predictors;
 my $pyrosetta;
+my $docker_image = 'alphafold_3dfi';
+my $rebuild_docker;
 GetOptions(
 	'c|config=s' => \$config_file,
 	'w|write=s' => \$write,
 	'p|path=s' => \$path_3DFI,
 	'd|dbdir=s' => \$database,
 	'i|install=s@{1,}' => \@predictors,
-	'pyr|pyrosetta=s' => \$pyrosetta
+	'pyr|pyrosetta=s' => \$pyrosetta,
+	'name|docker_image=s' => \$docker_image,
+	'rebuild' => \$rebuild_docker
 );
 
 ######################################################
@@ -104,23 +112,11 @@ foreach my $predictor (@predictors){
 	}
 	## Checking for Docker
 	if ($predictor eq 'alphafold'){
-		my $docker = `command -v docker`;
-		chomp $docker;
-		if ($docker eq ''){
-			print "\n[E] Docker not found. AlphaFold requires Docker. Please make sure that Docker is properly installed before using setup_3DFI.pl.\n";
-			print "[E] Exiting...\n\n";
-			exit;
-		}
+		check_program('docker', 'AlphaFold');
 	}
 	## Checking for Conda
 	elsif ($predictor eq 'rosettafold'){
-		my $conda = `command -v conda`;
-		chomp $conda;
-		if ($conda eq ''){
-			print "\n[E] Conda not found. RoseTTAFold requires Conda. Please make sure that Conda is properly installed before using setup_3DFI.pl.\n";
-			print "[E] Exiting...\n\n";
-			exit;
-		}
+		check_program('conda', 'RoseTTAFold');
 	}
 }
 
@@ -224,9 +220,21 @@ foreach my $predictor (@predictors){
 		else { system "git clone $alphafold_git"; }
 
 		# Creating Docker image + pip install of reqs
-		print "\nCreating AlphaFold docker image named alphafold_3dfi\n";
+		print "\nCreating AlphaFold docker image named $docker_image\n";
 		chdir "$root_3D/alphafold/";
-		system "docker build -f $root_3D/alphafold/docker/Dockerfile -t alphafold_3dfi .";
+
+		# rebuild flags
+		my $docker_rebuild_flags = '';
+		if ($rebuild_docker){
+			$docker_rebuild_flags = '--pull --no-cache';
+		}
+
+		system "docker \\
+			build \\
+			-f $root_3D/alphafold/docker/Dockerfile \\
+			$docker_rebuild_flags \\
+			-t $docker_image \\
+			.";
 
 		# Creating a pip location for AlphaFold requirements
 		unless (-d $pip_location){
@@ -351,6 +359,18 @@ exit;
 
 ######################################################
 # subroutines
+sub check_program {
+	my $program = $_[0];
+	my $prereq = $_[1];
+	my $status = `echo \$(command -v $program)`;
+	chomp $status;
+	if ($status eq ''){
+		print "\n[E] $program not found. $prereq requires $program. Please make sure that $program is properly installed before using setup_3DFI.pl.\n";
+		print "[E] Exiting...\n\n";
+		exit;
+	}
+}
+
 sub set_main {
 	my $fh = shift;
 	my $bar = '#' x 50;
