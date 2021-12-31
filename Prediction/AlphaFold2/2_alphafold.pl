@@ -143,15 +143,18 @@ while (my $fasta = shift @fasta){
 			$gpu_devices = '';
 		}
 
+		print "alpha_db = $alpha_db\n";
+		print "max_template_date = $max_date\n";
+
 		# Folding
 		system "python3 \\
 			$alpha_home/docker/run_docker.py \\
 			--fasta_paths=$fasta \\
 			--docker_image_name=$docker_image_name \\
-			--download_dir=$alpha_db \\
+			--data_dir=$alpha_db \\
 			--output_dir=$outdir \\
 			--max_template_date=$max_date \\
-			--preset=$preset \\
+			--db_preset=$preset \\
 			$gpu_devices \\
 			$gpu_check
 		";
