@@ -16,6 +16,7 @@ import argparse
 import numpy as np
 import pandas as pd
 import seaborn as sns
+from Bio import SeqIO
 from matplotlib import pyplot as plt
 
 def main(input_directory, output_file, swissprot_tsv, plot_file):
@@ -63,7 +64,7 @@ def main(input_directory, output_file, swissprot_tsv, plot_file):
 
 	# Adds locations of canonical proteoform to splice isoform rows in main_df.
 	if swissprot_tsv is not None:
-		sp = pd.read_csv(sp_tsv, sep = "\t")
+		sp = pd.read_csv(swissprot_tsv, sep = "\t")
 		locations = []
 		for i in range(len(main_df)):
 		    locs = list(sp.loc[sp["Entry name"]==main_df.iloc[i]["prot_name"]]["Subcellular location [CC]"].values)
@@ -84,12 +85,12 @@ def main(input_directory, output_file, swissprot_tsv, plot_file):
 		main_df["location"]=locations
 	
 	# Saves the main DataFrame as a .csv.
-	if input_dir is not None:
-		main_df.to_csv(output_file)
+	if output_file is not None:
+		main_df.to_csv(output_file, index=False)
 
 	# Saves a distribution plot of lengths of splice isoforms.
 	if plot_file is not None:
-		sns.displot([len(seq) for seq in main_df["prot_sequence"].values]).save
+		sns.displot([len(seq) for seq in main_df["prot_sequence"].values])
 		plt.savefig(plot_file)
 
 if __name__ == "__main__":
@@ -115,7 +116,7 @@ if __name__ == "__main__":
 		parser.add_argument("-o", "--output_file", help="Path to .csv file to be made from a Pandas Dataframe of all JCAST tier 1-3 isoforms. Must include .csv extension.")
 		parser.add_argument("-s", "--swissprot_tsv", help="Path to .tsv file containing the SwissProt database with subcellular locations, /mnt/databases/Human_SwissProt_Proteome_with_Subcellular_Locations.tsv on Lam Lab GPU workstation.")
 		parser.add_argument("-p", "--plot_file", help="Path to image file to be made from distribution plot of isoform lengths. Must include extension: .png, .jpeg, etc.")
-		args = parser.parse_arguments()
+		args = parser.parse_args()
 
 		main(
 			input_directory = args.input_directory,
